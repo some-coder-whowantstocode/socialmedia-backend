@@ -1,0 +1,19 @@
+const {customerr} = require('../Error/errorhandler');
+const  {StatusCodes} = require('http-status-codes')
+
+function errorHandlerMiddleware(err, req, res, next){
+    if (err instanceof customerr) {
+     return res.status(err.statusCode).json({ msg: err.message })
+    }
+    else{
+        if(err.code===11000){
+           return res.status(StatusCodes.BAD_REQUEST).send({ message: 'User already exists.' });
+        }
+        if (err.name === 'ValidationError' && err.errors.devid && err.errors.devid.kind === 'enum') {
+         return res.status(StatusCodes.BAD_REQUEST).send({ error: `Invalid value for devid.` });
+       } 
+       return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({ err })
+    }
+  }
+  
+  module.exports = errorHandlerMiddleware
