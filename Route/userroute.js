@@ -15,7 +15,9 @@ const {
     addfriend,
     allfriends,
     check,
-    find
+    find,
+    addprofilephoto,
+    getprofilephoto
  } = require('../Controller/controller');
 const userauthentication = require('../middleware/userauthentication');
 
@@ -33,6 +35,8 @@ router.get('/friends/:id',allfriends)
 router.get('/auth/:token',check)
 router.post('/addfriend',userauthentication,addfriend)
 router.get('/find/:id',find)
+router.post('/addprofilephoto',userauthentication,addprofilephoto)
+router.post('/getprofilephoto',getprofilephoto)
 
 
 module.exports = router

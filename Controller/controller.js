@@ -4,6 +4,9 @@ const badrequest = require('../Error/badrequest');
 const { ObjectId } = require('mongodb');
 const jwt = require('jsonwebtoken');
 const chatmodel = require('../Model/chatmodel');
+const {uploadbase64stringtogridfs} = require('../utility/uploadprofilephoto')
+const {getfromgrid} = require('../utility/getfromgrid');
+const { deletefromgridfs } = require('../utility/deletefromgrid');
 
 const search =async(req,res)=>{
     const {username} = req.params;
@@ -19,14 +22,28 @@ const search =async(req,res)=>{
 }
 
 const addfriend = async(req,res)=>{
-    // console.log(req.body)
+    console.log(req.body)
     const me = req.user.userId;
     const {friend} =req.body;
     if(!friend){
+
         throw new badrequest('no friend.')
     }
   
-    let Friend = await User.findById(friend);
+    const Friend = await User.updateOne({_id:friend},{
+        $addToSet:{friends:new ObjectId(me)}
+    },
+    {new:true},
+    function(error,success){
+        if(error){
+            console.log(error)
+            throw new badrequest('some problem here')
+        }else{
+
+        }
+    })
+    //  await User.findById(friend);
+    console.log(friend)
     if(!Friend){
         throw new badrequest('no such person.')
     }
@@ -38,13 +55,14 @@ const addfriend = async(req,res)=>{
     {new:true},
     function(error,success){
         if(error){
-            throw new badrequest(error)
+            throw new badrequest('some problemm here')
         }else{
            
         }
     })
-    let chat = await chatmodel.create({chatName:Friend.username,users:[Friend._id,req.user.userId]})
-    res.status(StatusCodes.OK).json(`${Friend.username} has been added to friendlist.`)
+
+    let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
+    res.status(StatusCodes.OK).json({msg:`${Friend.username} has been added to friendlist.`,friend:Friend})
 }
 
 
@@ -92,10 +110,58 @@ const find=async(req,res)=>{
     res.status(StatusCodes.OK).json(user)
 }
 
+const addprofilephoto =async(req,res)=>{
+    const {image,name} = req.body;
+    if(!image || !name){
+        throw new badrequest('please provide all required parameters.')
+    }
+    let uSer = await User.findById(req.user.userId)
+    if(uSer.pic){
+        console.log(uSer.pic)
+        await deletefromgridfs(uSer.pic)
+    }
+    let gridid = await uploadbase64stringtogridfs(image,name);
+    let user = await User.findOneAndUpdate({_id:req.user.userId},{pic:gridid},{new:true});
+    
+    res.status(StatusCodes.OK).json({user})
+}
+
+const getprofilephoto =async(req,res)=>{
+    // console.log(req.user)
+    const {id,name} = req.body;
+    if(!id && !name){
+        throw new badrequest('please provide id or name')
+    }
+
+    // let profile;
+    if(id){
+    var profile = await User.findById(id);
+    // console.log(1)
+    }else{
+    var profile = await User.findOne({username :name});
+   
+    }
+    
+    if(profile.pic){
+       
+        let files = await getfromgrid(profile);
+
+        // console.log(files)
+       return  res.status(StatusCodes.OK).json(files)
+    }else{
+       
+        res.status(StatusCodes.OK).json('no image')
+
+    }
+}
+
+
 module.exports ={
     search,
     addfriend,
     allfriends,
     check,
-    find
+    find,
+    addprofilephoto,
+    getprofilephoto
 }

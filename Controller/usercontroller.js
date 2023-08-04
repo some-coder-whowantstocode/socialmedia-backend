@@ -18,7 +18,6 @@ const register =async(req,res)=>{
     };
     if(password.length<6){
        throw new customerr('Password must be longer than 6.',500);
-
     };
     // let date = new Date(dob)
    let user = await User.create({Email,username,password,dob});
@@ -28,6 +27,7 @@ const register =async(req,res)=>{
 
 const login = async(req,res)=>{
     const {Email,password} = req.body;
+    console.log(req.body)
     if(!Email||!password){
         throw new badrequest('Please provide all the required parameters.')
     }
@@ -55,11 +55,12 @@ const forgotpassword =async(req,res)=>{
     if(!Email||!username){
         throw new badrequest('Please provide all the required parameters.');
     };
+    
     let check = await User.findOne({Email});
     if(!check){
         throw new Notfound('Invalid emailid.');
     };
-    if(check.username === username){
+    if(!check.username === username){
         throw new Notfound('Invalid username.');
     }
     let id = check._id;
@@ -176,14 +177,16 @@ const forgot_password = async(req,res)=>{
 }
 
 const changeforgottenpassword = async(req,res)=>{
-   const {username,newpassword,repeatnewpassword} = req.body;
-   if(!username || !newpassword || !repeatnewpassword){
+   const {Email,newpassword,repeatnewpassword} = req.body;
+   console.log(req.body)
+   if(!Email || !newpassword || !repeatnewpassword){
     throw new badrequest('please provide all required password.')
    }
-   let uSer = await User.findOne({username});
+   let uSer = await User.findOne({Email});
    let pass = await uSer.createhass(newpassword)
-   const user = await User.findOneAndUpdate({username},{password:pass},{new:true});
-   
+   console.log(pass)
+   const user = await User.findOneAndUpdate({Email},{password:pass},{new:true});
+   console.log(user)
    if(!user){
     throw new badrequest('No such user exists.')
    }else{
