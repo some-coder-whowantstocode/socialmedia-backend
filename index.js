@@ -1,4 +1,4 @@
-require('express-async-errors')
+// require('express-async-errors')
 const express = require('express');
 const { connect } = require('mongoose');
 const app = express();
@@ -22,7 +22,7 @@ app.use(cors({
   }))
 
 
-
+  app.use(express.json({limit: '10mb'}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const Port = process.env.port||3000;
@@ -53,7 +53,7 @@ app.get('/',(req,res)=>{
     res.send('hi')
 })
 
-app.use(errorHandlerMiddleware)
+
 
 const io = new Server(server,{
     cors:{
@@ -73,3 +73,5 @@ io.on('connection',(socket)=>{
 
 
 start()
+
+app.use(errorHandlerMiddleware)

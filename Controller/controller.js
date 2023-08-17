@@ -22,7 +22,7 @@ const search =async(req,res)=>{
 }
 
 const addfriend = async(req,res)=>{
-    console.log(req.body)
+    // console.log(req.body)
     const me = req.user.userId;
     const {friend} =req.body;
     if(!friend){
@@ -42,8 +42,6 @@ const addfriend = async(req,res)=>{
 
         }
     })
-    //  await User.findById(friend);
-    console.log(friend)
     if(!Friend){
         throw new badrequest('no such person.')
     }
@@ -61,10 +59,59 @@ const addfriend = async(req,res)=>{
         }
     })
 
-    let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
+
+
+    // let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
     res.status(StatusCodes.OK).json({msg:`${Friend.username} has been added to friendlist.`,friend:Friend})
 }
 
+
+
+
+const removefriend = async(req,res)=>{
+    // console.log(req.body)
+    const me = req.user.userId;
+    const {friend} =req.body;
+    if(!friend){
+
+        throw new badrequest('no friend.')
+    }
+  
+    const Friend = await User.updateOne({_id:friend},{
+        $addToSet:{friends:new ObjectId(me)}
+    },
+    {new:true},
+    function(error,success){
+        if(error){
+            console.log(error)
+            throw new badrequest('some problem here')
+        }else{
+
+        }
+    })
+    
+    if(!Friend){
+        throw new badrequest('no such person.')
+    }
+   
+
+    let user = await User.updateOne({_id:me},{
+        $addToSet:{friends:new ObjectId(friend)}
+    },
+    {new:true},
+    function(error,success){
+        if(error){
+            throw new badrequest('some problemm here')
+        }else{
+           
+        }
+    })
+
+
+
+    // let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
+    res.status(StatusCodes.OK).json({msg:`${Friend.username} has been added to friendlist.`,friend:Friend})
+}
 
 const allfriends=async(req,res)=>{
     let {id} = req.params;
@@ -117,7 +164,7 @@ const addprofilephoto =async(req,res)=>{
     }
     let uSer = await User.findById(req.user.userId)
     if(uSer.pic){
-        console.log(uSer.pic)
+        // console.log(uSer.pic)
         await deletefromgridfs(uSer.pic)
     }
     let gridid = await uploadbase64stringtogridfs(image,name);
@@ -154,6 +201,8 @@ const getprofilephoto =async(req,res)=>{
 
     }
 }
+
+
 
 
 module.exports ={

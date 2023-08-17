@@ -19,19 +19,21 @@ const register =async(req,res)=>{
     if(password.length<6){
        throw new customerr('Password must be longer than 6.',500);
     };
+    
     // let date = new Date(dob)
    let user = await User.create({Email,username,password,dob});
    let token = await user.createJWT();
-    res.status(StatusCodes.CREATED).json({name:user.username,jwttoken:token});
+    res.status(StatusCodes.CREATED).json({username:user.username,jwttoken:token});
 }
 
 const login = async(req,res)=>{
     const {Email,password} = req.body;
-    console.log(req.body)
+    // console.log(req.body)
     if(!Email||!password){
         throw new badrequest('Please provide all the required parameters.')
     }
     const user = await User.findOne({Email})
+    
 
     if(!user){
         throw new UnauthenticatedError('Invalid credentials')
@@ -140,6 +142,8 @@ const deleteaccount =async(req,res)=>{
     if(!issame){
         throw new badrequest('Wrong password.');
     }
+
+    let isdeleted = await User.findOneAndDelete({Email})
     res.status(StatusCodes.OK).json({msg:"Succesfully deleted user."})
 }
 
@@ -178,15 +182,15 @@ const forgot_password = async(req,res)=>{
 
 const changeforgottenpassword = async(req,res)=>{
    const {Email,newpassword,repeatnewpassword} = req.body;
-   console.log(req.body)
+//    console.log(req.body)
    if(!Email || !newpassword || !repeatnewpassword){
     throw new badrequest('please provide all required password.')
    }
    let uSer = await User.findOne({Email});
    let pass = await uSer.createhass(newpassword)
-   console.log(pass)
+//    console.log(pass)
    const user = await User.findOneAndUpdate({Email},{password:pass},{new:true});
-   console.log(user)
+//    console.log(user)
    if(!user){
     throw new badrequest('No such user exists.')
    }else{

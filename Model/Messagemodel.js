@@ -13,7 +13,11 @@ const messagemodel = mongoose.Schema({
     chat:{
         type:ObjectId,
         ref:'Chat'
-    }
+    },
+    users:[{
+        type:ObjectId,
+        ref:'User'
+    }]
 },
 {
     timestamps:true
