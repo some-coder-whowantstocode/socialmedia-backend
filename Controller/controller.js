@@ -42,10 +42,11 @@ const addfriend = async(req,res)=>{
 
         }
     })
+    
     if(!Friend){
         throw new badrequest('no such person.')
     }
-   
+   let fRiend = await User.findById(friend);
 
     let user = await User.updateOne({_id:me},{
         $addToSet:{friends:new ObjectId(friend)}
@@ -62,7 +63,7 @@ const addfriend = async(req,res)=>{
 
 
     // let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
-    res.status(StatusCodes.OK).json({msg:`${Friend.username} has been added to friendlist.`,friend:Friend})
+    res.status(StatusCodes.OK).json({msg:`${fRiend.username} has been added to friendlist.`,friend:fRiend})
 }
 
 
