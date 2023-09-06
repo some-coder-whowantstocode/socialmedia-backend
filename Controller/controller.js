@@ -72,6 +72,7 @@ const addfriend = async(req,res)=>{
 const removefriend = async(req,res)=>{
     // console.log(req.body)
     const me = req.user.userId;
+    // console.log(me)
     const {friend} =req.body;
     if(!friend){
 
@@ -79,7 +80,7 @@ const removefriend = async(req,res)=>{
     }
   
     const Friend = await User.updateOne({_id:friend},{
-        $addToSet:{friends:new ObjectId(me)}
+        $pull: { friends: { $in: me  } } 
     },
     {new:true},
     function(error,success){
@@ -94,10 +95,11 @@ const removefriend = async(req,res)=>{
     if(!Friend){
         throw new badrequest('no such person.')
     }
-   
+    let fRiend = await User.findById(friend);
+
 
     let user = await User.updateOne({_id:me},{
-        $addToSet:{friends:new ObjectId(friend)}
+        $pull: { friends: { $in:  friend  } } 
     },
     {new:true},
     function(error,success){
@@ -111,7 +113,7 @@ const removefriend = async(req,res)=>{
 
 
     // let chat = await chatmodel.create({chatName:Friend.username,users:[friend,req.user.userId]})
-    res.status(StatusCodes.OK).json({msg:`${Friend.username} has been added to friendlist.`,friend:Friend})
+    res.status(StatusCodes.OK).json({msg:`${fRiend.username} has been removed from friendlist.`,friend:fRiend})
 }
 
 const allfriends=async(req,res)=>{
@@ -213,5 +215,6 @@ module.exports ={
     check,
     find,
     addprofilephoto,
-    getprofilephoto
+    getprofilephoto,
+    removefriend
 }

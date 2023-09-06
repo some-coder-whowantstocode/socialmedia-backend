@@ -50,7 +50,11 @@ const userschema = new mongoose.Schema({
     pic:{
         type:ObjectId,
         ref:'User'
-    }
+    },
+    chats:[{
+        type:ObjectId,
+        ref:'Chat'
+    }],
 })
 
 
@@ -101,4 +105,4 @@ userschema.methods.comparepassword = async function(canditatepassword){
 
 
 
-module.exports = mongoose.model('user',userschema)
+module.exports = mongoose.model('User',userschema)

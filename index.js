@@ -13,7 +13,8 @@ const errorHandlerMiddleware = require('./middleware/error-handler');
 const cors = require('cors');
 const { Server } = require('socket.io');
 require('ejs')
-const http = require('http')
+const http = require('http');
+const badrequest = require('./Error/badrequest');
 
 const server = http.createServer(app)
 app.use(cors({
@@ -53,6 +54,8 @@ app.get('/',(req,res)=>{
     res.send('hi')
 })
 
+try{
+
 
 
 const io = new Server(server,{
@@ -66,11 +69,20 @@ io.on('connection',(socket)=>{
     // console.log(`user connected : ${socket.id}`)
 
     socket.on("send_message",(data)=>{
-        
+     
         socket.broadcast.emit('receive_message',data)
+    }),
+
+    socket.on("delete_message_for_me",(data)=>{
+        
+        socket.broadcast.emit('deleted_message',data)
     })
 })
 
+}catch(error)
+{
+    throw new badrequest(error)
+}
 
 start()
 

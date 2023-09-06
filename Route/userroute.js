@@ -8,7 +8,7 @@ const {
     changepassword,
     deleteaccount,
     checkifexist,
-    changeforgottenpassword
+    changeforgottenpassword,
 } = require('../Controller/usercontroller');
 const { 
     search, 
@@ -17,7 +17,8 @@ const {
     check,
     find,
     addprofilephoto,
-    getprofilephoto
+    getprofilephoto,
+    removefriend
  } = require('../Controller/controller');
 const userauthentication = require('../middleware/userauthentication');
 
@@ -37,6 +38,7 @@ router.post('/addfriend',userauthentication,addfriend)
 router.get('/find/:id',find)
 router.post('/addprofilephoto',userauthentication,addprofilephoto)
 router.post('/getprofilephoto',getprofilephoto)
+router.post('/removefriend',userauthentication,removefriend)
 
 
 module.exports = router

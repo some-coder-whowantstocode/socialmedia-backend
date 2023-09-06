@@ -18,11 +18,13 @@ const chatmodel = mongoose.Schema(
         }],
         latestmessage:{
             type:ObjectId,
-            ref:'Message'
+            ref:'Message',
+            default:null
         },
         groupAdmin:{
             type:ObjectId,
-            ref:'User'
+            ref:'User',
+            default:null
         },
       
     },
