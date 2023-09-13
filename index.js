@@ -71,11 +71,34 @@ io.on('connection',(socket)=>{
     socket.on("send_message",(data)=>{
      
         socket.broadcast.emit('receive_message',data)
-    }),
+    })
 
     socket.on("delete_message_for_me",(data)=>{
         
         socket.broadcast.emit('deleted_message',data)
+    })
+
+    socket.on('user:join',({user,room})=>{
+        io.to(room).emit('user:joined',{user,socketid:socket.id})
+        socket.join(room)
+
+        io.to(socket.id).emit('user:join',{room:socket.id})
+    })
+
+    socket.on('user:call',({to,offer})=>{
+        io.to(to).emit('call:incoming',{from:socket.id,offer})
+    })
+
+    socket.on('call:accepted',({to,ans})=>{
+        io.to(to).emit('call:accepted',{from:socket.id,ans})
+    })
+
+    socket.on('peer:nego:needed',({offer,to})=>{
+        io.to(to).emit('peer:nego:needed',{from:socket.id,offer})
+    })
+
+    socket.on('peer:nego:done',({to,ans})=>{
+        io.to(to).emit('peer:nego:final',{from:socket.id,ans})
     })
 })
 
