@@ -86,6 +86,7 @@ io.on('connection',(socket)=>{
     })
 
     socket.on('user:call',({to,offer})=>{
+        console.log('call going')
         io.to(to).emit('call:incoming',{from:socket.id,offer})
     })
 
@@ -99,6 +100,18 @@ io.on('connection',(socket)=>{
 
     socket.on('peer:nego:done',({to,ans})=>{
         io.to(to).emit('peer:nego:final',{from:socket.id,ans})
+    })
+
+    socket.on('cam:turn:off',({to})=>{
+        io.to(to).emit('cam:off',{from:socket.id})
+    })
+
+    socket.on('user:leave',({user,room})=>{
+        io.in(room).emit('user:left',{user})
+        socket.leave(room)
+        console.log('leave')
+        // socket.disconnect(0)
+        // io.to(socket.id).emit('user:join',{room:socket.id})
     })
 })
 
