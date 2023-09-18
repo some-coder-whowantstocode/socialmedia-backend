@@ -65,6 +65,12 @@ const io = new Server(server,{
     }
 })
 
+function sendHeartbeat(){
+    setTimeout(sendHeartbeat, 8000);
+    io.sockets.emit('ping', { beat : 1 });
+}
+
+
 io.on('connection',(socket)=>{
     // console.log(`user connected : ${socket.id}`)
 
@@ -119,6 +125,8 @@ io.on('connection',(socket)=>{
 {
     throw new badrequest(error)
 }
+
+setTimeout(sendHeartbeat, 8000);
 
 start()
 
